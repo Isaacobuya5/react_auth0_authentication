@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 const Home = props => {
     return (
@@ -6,10 +6,6 @@ const Home = props => {
             Home page
         </div>
     );
-};
-
-Home.propTypes = {
-    
 };
 
 export default Home;
