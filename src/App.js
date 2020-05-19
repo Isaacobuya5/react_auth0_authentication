@@ -9,8 +9,10 @@ function App() {
     <div className="App">
       <NavBar />
       <Switch>
+        <div className="body">
         <Route path="/" component={Home} exact/>
         <Route path="/profile" component={Profile} />
+        </div>
       </Switch>
     </div>
   );
