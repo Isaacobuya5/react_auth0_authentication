@@ -47,5 +47,11 @@ export default class Auth {
         localStorage.setItem("expires_at", expiresAt);
     }
 
+    // check if user is still logged in
+    isAuthenticated = () => {
+        const expiresAt = JSON.parse(localStorage.getItem("expires_at"));
+        const currentTime = new Date().getTime();
+        return currentTime < expiresAt;
+    }
 
 }
