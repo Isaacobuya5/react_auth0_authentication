@@ -5,6 +5,7 @@ export default class Auth {
     // we need to pass React Router's history to constructor to enable Auth perform redirects
     constructor(history) {
         this.history = history;
+        this.userProfile = null;
         // instantiate auth0 WebAuth
         this.auth0 = new auth0.WebAuth({
             domain: process.env.REACT_APP_AUTH0_DOMAIN,
@@ -53,5 +54,41 @@ export default class Auth {
         const currentTime = new Date().getTime();
         return currentTime < expiresAt;
     }
+
+    // logout a user if logged in
+    logout = () => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("id_token");
+        localStorage.removeItem("expires_at");
+        // upon logout clear user profile
+        this.userProfile = null;
+        // navigate to home page after logout
+        this.auth0.logout({
+            clientID: process.env.REACT_APP_AUTH0_CLIENT_ID,
+            returnTo: "http://localhost:3000"
+        });
+    }
+
+    // get the access token
+    getAccessToken = () => {
+        const accessToken = localStorage.getItem("access_token");
+        if (!accessToken) {
+            throw new Error("No access token found.")
+        }
+
+        return accessToken;
+    }
+
+    // getting the user profile
+    getUserProfile = cb => {
+        // return user profile if already found.
+        if (this.userProfile) return cb(this.userProfile);
+
+        this.auth0.client.userInfo(this.getAccessToken(), (error, profile) => {
+            if (profile) this.userProfile = profile;
+            cb(profile, error);
+        });
+    };
+
 
 }
