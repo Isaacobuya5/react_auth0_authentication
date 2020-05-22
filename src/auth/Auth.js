@@ -6,6 +6,7 @@ export default class Auth {
     constructor(history) {
         this.history = history;
         this.userProfile = null;
+        this.requestedScopes = "openid profile email read:courses";
         // instantiate auth0 WebAuth
         this.auth0 = new auth0.WebAuth({
             domain: process.env.REACT_APP_AUTH0_DOMAIN,
@@ -13,7 +14,7 @@ export default class Auth {
             redirectUri: process.env.REACT_APP_AUTH0_CALLBACK_URL,
             audience: process.env.REACT_APP_AUTH0_AUDIENCE,
             responseType: "token id_token",
-            scope: "openid profile email"
+            scope: this.requestedScopes
         })
     }
 
@@ -43,10 +44,17 @@ export default class Auth {
         // gives us the unix epuch time that the token will expire
         const expiresAt = JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime());
 
+        // If there is a value on the scope param from the authResult
+        // use it to set scopes in the session for the user. Otherwise
+        // use the scopes as requested. If no scopes were requested
+        // set it to nothing 
+        const scopes = authResult.scope || this.requestedScopes || '';
+
         // save the tokens in local Storage
         localStorage.setItem("access_token", authResult.accessToken);
         localStorage.setItem("id_token", authResult.idToken);
         localStorage.setItem("expires_at", expiresAt);
+        localStorage.setItem("scopes", JSON.stringify(scopes));
     }
 
     // check if user is still logged in
@@ -61,6 +69,7 @@ export default class Auth {
         localStorage.removeItem("access_token");
         localStorage.removeItem("id_token");
         localStorage.removeItem("expires_at");
+        localStorage.removeItem("scopes");
         // upon logout clear user profile
         this.userProfile = null;
         // navigate to home page after logout
@@ -91,6 +100,17 @@ export default class Auth {
             cb(profile, error);
         });
     };
+
+    // check if a user has a given scope
+    userHasScopes = (scopes) => {
+
+        // getting the granted scopes
+        const grantedScopes = (
+            JSON.parse(localStorage.getItem("scopes")) || ""
+        ).split(" ");
+
+        return scopes.every(scope => grantedScopes.includes(scope));
+    }
 
 
 }

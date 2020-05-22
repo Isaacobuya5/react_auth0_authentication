@@ -24,7 +24,7 @@ function App(props) {
         <Route path="/profile" render={props => auth.isAuthenticated() ? (<Profile auth={auth} {...props}/>) : (<Redirect to="/" />) } />
         <Route path="/callback" render={props => <Callback auth={auth} {...props}/>} />
         <Route path="/public" component={Public} />
-        <Route path="/private" render={props => auth.isAuthenticated() ? (<Private auth={auth} {...props}/>) : (<Redirect to="/" />) } />
+        <Route path="/private" render={props => auth.isAuthenticated() ? (<Private auth={auth} {...props}/>) : auth.login() } />
         </div>
       </Switch>
     </div>
