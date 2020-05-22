@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("express-jwt"); // Validates JWT and sets req.user
 const jwksRsa = require("jwks-rsa"); //Retrieve RSA keys from a JSON Web Key Set(JWKS) endpont.
+const checkScopes = require("express-jwt-authz"); //Validate JWT scopes
 
 require("dotenv").config();
 
@@ -42,4 +43,15 @@ app.get("/private", checkJwt, (req, res) => {
     });
 });
 
+// third route - private API
+// check for JWT before request is fulfilled
+// check if access token has requested scope
+app.get("/courses", checkJwt, checkScopes(["read:courses"]), (req, res) => {
+    res.json({
+        courses: [
+            { id: 1, title: "Building Secure React Applications"},
+            { id: 2, title: "React Redux for State Management"}
+        ]
+    });
+});
 app.listen(3001);
