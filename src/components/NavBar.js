@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const NavBar = (props) => {
 
-    const { isAuthenticated, login, logout } = props.auth;
+    const { isAuthenticated, login, logout, userHasScopes } = props.auth;
     return (
         <nav>
         <ul>
@@ -12,6 +12,9 @@ const NavBar = (props) => {
             <li><Link to="/public">Public</Link></li>
             {isAuthenticated() ? <li>
                 <Link to="/private">Private</Link>
+            </li> : ""}
+            {isAuthenticated() && userHasScopes(["read:courses"]) ? <li>
+                <Link to="/courses">Courses</Link>
             </li> : ""}
             <li>
                 <button onClick={ isAuthenticated() ? logout : login}>
