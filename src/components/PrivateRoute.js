@@ -1,8 +1,12 @@
- import React from "react";
+ import React, { useContext } from "react";
 import { Route } from "react-router-dom";
 import PropTypes from "prop-types";
+import AuthContext from "../contexts/AuthContexts";
 
-const PrivateRoute = ({ component: Component, auth, scopes, ...rest}) => {
+const PrivateRoute = ({ component: Component, scopes, ...rest}) => {
+
+    const auth = useContext(AuthContext);
+    console.log(auth);
     return (
         <Route 
             {...rest}
