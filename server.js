@@ -28,6 +28,20 @@ const checkJwt = jwt({
     algorithms: ["RS256"]
 });
 
+// check role middleware
+function checkRole(role) {
+    return function(req, res, next) {
+        const assignedRoles = req.user["http://localhost:3000/roles"];
+        if (Array.isArray(assignedRoles) && assignedRoles.includes(role)) {
+            console.log("success");
+            return next();
+        } else {
+            console.log("error");
+            res.status(401).send("Insufficient role");
+        }
+    }
+}
+
 // first route - public API
 app.get("/public", (req, res) => {
     res.json({
@@ -52,6 +66,14 @@ app.get("/courses", checkJwt, checkScopes(["read:courses"]), (req, res) => {
             { id: 1, title: "Building Secure React Applications"},
             { id: 2, title: "React Redux for State Management"}
         ]
+    });
+});
+
+// fourth-route - private API
+// access to admin only role
+app.get("/admin", checkJwt, checkRole('admin'), (req, res) => {
+    res.json({
+        message: "Hello from Admin API!"
     });
 });
 app.listen(3001);
