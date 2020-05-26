@@ -66,6 +66,8 @@ export default class Auth {
         // save the tokens in local Storage
         _accessToken = authResult.accessToken;
         _idToken = authResult.idToken;
+        // ask auth for a new token when the current token expires
+        this.scheduleTokenRenewal();
     }
 
     // check if user is still logged in
@@ -123,5 +125,11 @@ export default class Auth {
             if (cb) cb(err, result);
         });
     };
+
+    // renew tokens automatically when token expires
+    scheduleTokenRenewal = () => {
+        const delay = _expiresAt - Date.now();
+        if (delay > 0) setTimeout(() => this.renewToken(), delay);
+    }
 
 }
