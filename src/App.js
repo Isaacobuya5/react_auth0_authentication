@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, {  useEffect, useMemo, useState } from "react";
 import { Switch, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
@@ -14,13 +14,15 @@ import PrivateRoute from "./components/PrivateRoute";
 import AuthContext from "./contexts/AuthContexts";
 
 function App(props) {
-  // const auth = useMemo(() => new Auth(props.history), []);
+  const auth = useMemo(() => new Auth(props.history), []);
 
-  const [authObject,  ] = useState({
-    auth: new Auth(props.history)
-  });
+  const [tokenRenewalComplete, setTokenRenewalComplete] = useState(false);
 
-  const { auth } = authObject;
+  useEffect(() => {
+    auth.renewToken(() => setTokenRenewalComplete(true));
+  },[tokenRenewalComplete]);
+
+  if (!tokenRenewalComplete) return "Loading...";
 
   // we need to pass this props down to the home component as a prop with help of render props
 
